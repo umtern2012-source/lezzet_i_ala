@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>LEZZET-İ ALA ADMIN</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyC_JxCdJ8Zjzkjg-Y8ntiiaBukhC2EPbPY",
+  authDomain: "lezzetiala-25576.firebaseapp.com",
+  projectId: "lezzetiala-25576",
+  storageBucket: "lezzetiala-25576.firebasestorage.app",
+  messagingSenderId: "551557573651",
+  appId: "1:551557573651:web:d886b7ecaa11458655e3e6"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+</script>
+
+<style>
+body{background:black;color:white;font-family:Arial;padding:20px}
+input{padding:10px;margin:5px;border-radius:6px}
+button{background:orange;color:black;padding:10px;border:none;border-radius:8px}
+</style>
+</head>
+
+<body>
+<h2>🔥 LEZZET-İ ALA YÖNETİCİ PANELİ</h2>
+
+<input id="ad" placeholder="Ürün adı">
+<input id="fiyat" placeholder="Fiyat">
+<input id="resim" placeholder="Resim URL">
+<button onclick="ekle()">ÜRÜN EKLE</button>
+
+<h3>📦 Ürünler</h3>
+<div id="liste"></div>
+
+<script>
+function ekle(){
+ db.collection("urunler").add({
+  ad:ad.value,
+  fiyat:parseFloat(fiyat.value),
+  resim:resim.value
+ });
+}
+
+db.collection("urunler").onSnapshot(snap=>{
+ liste.innerHTML="";
+ snap.forEach(doc=>{
+   let u=doc.data();
+   liste.innerHTML+=`
+   <div>
+   ${u.ad} - ${u.fiyat} TL
+   <button onclick="sil('${doc.id}')">Sil</button>
+   </div>`;
+ });
+});
+
+function sil(id){
+ db.collection("urunler").doc(id).delete();
+}
+</script>
+
+</body>
+</html>
