@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Lezzet-i Ala Admin Panel</title>
+<style>
+
+body {
+  margin:0;
+  font-family: Arial;
+  background:#000;
+  color:white;
+}
+
+/* PANEL ORTASI */
+#panel {
+  width:1000px;
+  height:700px;
+  background:#111;
+  border:3px solid orange;
+  border-radius:15px;
+  margin:auto;
+  margin-top:40px;
+  display:flex;
+  box-shadow:0 0 20px orange;
+}
+
+/* SOL MENÜ */
+#menu {
+  width:200px;
+  background:#000;
+  border-right:2px solid orange;
+  padding:15px;
+}
+
+#menu button {
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  background:#222;
+  color:white;
+  border:1px solid orange;
+  border-radius:8px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+#menu button:hover {
+  background:orange;
+  color:black;
+}
+
+/* SAĞ ALAN */
+#content {
+  flex:1;
+  padding:20px;
+}
+
+input, select {
+  width:100%;
+  padding:10px;
+  margin:5px 0;
+  background:#000;
+  color:white;
+  border:1px solid orange;
+  border-radius:6px;
+}
+
+.bigbtn {
+  background:orange;
+  color:black;
+  padding:12px;
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+  cursor:pointer;
+  margin-top:10px;
+}
+
+pre {
+  background:#000;
+  padding:10px;
+  border:1px solid orange;
+  height:200px;
+  overflow:auto;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="panel">
+
+<!-- SOL MENÜ -->
+<div id="menu">
+  <h3>⚙️ Admin Panel</h3>
+  <button onclick="showTab('product')">📦 Ürün Ekle</button>
+  <button onclick="showTab('category')">📂 Kategori</button>
+  <button onclick="showTab('export')">💾 JSON Export</button>
+</div>
+
+<!-- SAĞ PANEL -->
+<div id="content">
+
+<div id="product" class="tab">
+<h2>Ürün Ekle</h2>
+<input id="pname" placeholder="Ürün adı">
+<input id="pprice" type="number" placeholder="Fiyat">
+<select id="pcat"></select>
+<button class="bigbtn" onclick="addProduct()">➕ Ekle</button>
+</div>
+
+<div id="category" class="tab" style="display:none">
+<h2>Kategori Yönetimi</h2>
+<input id="catname" placeholder="Kategori adı">
+<button class="bigbtn" onclick="addCategory()">➕ Kategori Ekle</button>
+</div>
+
+<div id="export" class="tab" style="display:none">
+<h2>JSON Export (Müşteri siteye yapıştır)</h2>
+<button class="bigbtn" onclick="exportData()">📤 Export</button>
+<pre id="output"></pre>
+</div>
+
+</div>
+</div>
+
+<script>
+let categories=["Kokoreç","Köfte","Izgara"];
+let products=[];
+
+// TAB
+function showTab(id){
+ document.querySelectorAll(".tab").forEach(t=>t.style.display="none");
+ document.getElementById(id).style.display="block";
+}
+
+// KATEGORİ SELECT
+function refreshCat(){
+ let s=document.getElementById("pcat");
+ s.innerHTML="";
+ categories.forEach(c=>{
+  let o=document.createElement("option");
+  o.innerText=c;
+  s.appendChild(o);
+ });
+}
+refreshCat();
+
+// KATEGORİ EKLE
+function addCategory(){
+ let c=document.getElementById("catname").value;
+ categories.push(c);
+ refreshCat();
+ alert("Kategori eklendi!");
+}
+
+// ÜRÜN EKLE
+function addProduct(){
+ let name=pname.value;
+ let price=pprice.value;
+ let cat=pcat.value;
+ products.push({name,price,category:cat});
+ alert("Ürün eklendi!");
+}
+
+// EXPORT
+function exportData(){
+ let data = JSON.stringify(products, null, 2);
+ document.getElementById("output").innerText=data;
+}
+</script>
+
+</body>
+</html>
