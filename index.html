@@ -2,174 +2,128 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lezzet-i Ala Admin Panel</title>
+
 <style>
-
-body {
-  margin:0;
-  font-family: Arial;
-  background:#000;
-  color:white;
+body{
+margin:0;font-family:Arial;background:black;color:white;
+overflow-x:hidden;
 }
-
-/* PANEL ORTASI */
-#panel {
-  width:1000px;
-  height:700px;
-  background:#111;
-  border:3px solid orange;
-  border-radius:15px;
-  margin:auto;
-  margin-top:40px;
-  display:flex;
-  box-shadow:0 0 20px orange;
+.container{
+max-width:1100px;margin:auto;padding:15px;
+animation:fadeIn 1s ease;
 }
-
-/* SOL MENÜ */
-#menu {
-  width:200px;
-  background:#000;
-  border-right:2px solid orange;
-  padding:15px;
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(20px);}
+to{opacity:1;transform:translateY(0);}
 }
-
-#menu button {
-  width:100%;
-  padding:12px;
-  margin:8px 0;
-  background:#222;
-  color:white;
-  border:1px solid orange;
-  border-radius:8px;
-  font-size:16px;
-  cursor:pointer;
+h1{color:orange;text-align:center;font-size:28px;}
+.card{
+background:#111;border:2px solid orange;padding:15px;border-radius:15px;margin-bottom:15px;
+box-shadow:0 0 10px orange;
+transition:.3s;
 }
-
-#menu button:hover {
-  background:orange;
-  color:black;
+.card:hover{transform:scale(1.02);}
+input,select,button{
+width:100%;padding:10px;margin:5px 0;border-radius:8px;border:none;
+font-size:16px;
 }
-
-/* SAĞ ALAN */
-#content {
-  flex:1;
-  padding:20px;
+button{
+background:orange;color:black;font-weight:bold;cursor:pointer;
+transition:.2s;
 }
-
-input, select {
-  width:100%;
-  padding:10px;
-  margin:5px 0;
-  background:#000;
-  color:white;
-  border:1px solid orange;
-  border-radius:6px;
+button:hover{background:white;}
+.red{background:red;color:white;}
+table{
+width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;
 }
-
-.bigbtn {
-  background:orange;
-  color:black;
-  padding:12px;
-  border:none;
-  border-radius:8px;
-  font-size:16px;
-  cursor:pointer;
-  margin-top:10px;
+td,th{
+border:1px solid orange;padding:8px;text-align:center;
 }
-
-pre {
-  background:#000;
-  padding:10px;
-  border:1px solid orange;
-  height:200px;
-  overflow:auto;
+pre{
+background:black;border:1px solid orange;padding:10px;border-radius:8px;
+max-height:200px;overflow:auto;font-size:12px;
 }
-
 </style>
 </head>
 
 <body>
 
-<div id="panel">
+<div class="container">
+<h1>⚙️ LEZZET-İ ALA ADMIN PANEL</h1>
 
-<!-- SOL MENÜ -->
-<div id="menu">
-  <h3>⚙️ Admin Panel</h3>
-  <button onclick="showTab('product')">📦 Ürün Ekle</button>
-  <button onclick="showTab('category')">📂 Kategori</button>
-  <button onclick="showTab('export')">💾 JSON Export</button>
-</div>
-
-<!-- SAĞ PANEL -->
-<div id="content">
-
-<div id="product" class="tab">
-<h2>Ürün Ekle</h2>
+<div class="card">
+<h3>➕ Ürün Ekle</h3>
 <input id="pname" placeholder="Ürün adı">
 <input id="pprice" type="number" placeholder="Fiyat">
-<select id="pcat"></select>
-<button class="bigbtn" onclick="addProduct()">➕ Ekle</button>
+<select id="pcat">
+<option>Kokoreç</option>
+<option>Köfte</option>
+<option>Izgara</option>
+</select>
+<button onclick="addProduct()">Ürün Ekle</button>
 </div>
 
-<div id="category" class="tab" style="display:none">
-<h2>Kategori Yönetimi</h2>
-<input id="catname" placeholder="Kategori adı">
-<button class="bigbtn" onclick="addCategory()">➕ Kategori Ekle</button>
+<div class="card">
+<h3>📦 Ürün Listesi</h3>
+<table id="productTable"></table>
 </div>
 
-<div id="export" class="tab" style="display:none">
-<h2>JSON Export (Müşteri siteye yapıştır)</h2>
-<button class="bigbtn" onclick="exportData()">📤 Export</button>
-<pre id="output"></pre>
+<div class="card">
+<h3>🤖 Otomatik JSON (Müşteri Siteye Kopyala)</h3>
+<pre id="jsonBox"></pre>
 </div>
 
-</div>
 </div>
 
 <script>
-let categories=["Kokoreç","Köfte","Izgara"];
-let products=[];
-
-// TAB
-function showTab(id){
- document.querySelectorAll(".tab").forEach(t=>t.style.display="none");
- document.getElementById(id).style.display="block";
-}
-
-// KATEGORİ SELECT
-function refreshCat(){
- let s=document.getElementById("pcat");
- s.innerHTML="";
- categories.forEach(c=>{
-  let o=document.createElement("option");
-  o.innerText=c;
-  s.appendChild(o);
- });
-}
-refreshCat();
-
-// KATEGORİ EKLE
-function addCategory(){
- let c=document.getElementById("catname").value;
- categories.push(c);
- refreshCat();
- alert("Kategori eklendi!");
-}
+// TARAYICIYA KAYITLI ÜRÜNLERİ YÜKLE
+let products = JSON.parse(localStorage.getItem("products")) || [];
 
 // ÜRÜN EKLE
 function addProduct(){
  let name=pname.value;
  let price=pprice.value;
  let cat=pcat.value;
+ if(!name || !price) return alert("Ürün adı ve fiyat gir!");
  products.push({name,price,category:cat});
- alert("Ürün eklendi!");
+ save();
+ pname.value=""; pprice.value="";
 }
 
-// EXPORT
-function exportData(){
- let data = JSON.stringify(products, null, 2);
- document.getElementById("output").innerText=data;
+// KAYDET
+function save(){
+ localStorage.setItem("products", JSON.stringify(products));
+ render();
 }
+
+// TABLOYU YENİLE
+function render(){
+ let table=document.getElementById("productTable");
+ table.innerHTML="<tr><th>Ad</th><th>Fiyat</th><th>Kategori</th><th>Sil</th></tr>";
+ products.forEach((p,i)=>{
+  table.innerHTML+=`
+  <tr>
+    <td>${p.name}</td>
+    <td>${p.price} TL</td>
+    <td>${p.category}</td>
+    <td><button class="red" onclick="del(${i})">Sil</button></td>
+  </tr>`;
+ });
+
+ // OTOMATİK JSON
+ document.getElementById("jsonBox").innerText = JSON.stringify(products,null,2);
+}
+
+// SİL
+function del(i){
+ products.splice(i,1);
+ save();
+}
+
+// İlk açılışta yükle
+render();
 </script>
 
 </body>
